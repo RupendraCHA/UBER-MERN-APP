@@ -3,6 +3,7 @@ import {assets} from "../assets/assets.js"
 import {Link} from "react-router-dom"
 
 const Home = () => {
+  
   return (
     <div>
         <div 
