@@ -37,7 +37,6 @@ const UserSignup = () => {
       localStorage.setItem("token", data.token)
       navigate("/home")
     }
-
     setFirstname('')
     setLastname('')
     setEmail('')
