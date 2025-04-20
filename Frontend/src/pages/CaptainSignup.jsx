@@ -1,6 +1,9 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { assets } from '../assets/assets'
 import { Link } from 'react-router-dom'
+import { CaptainDataContext } from '../context/CaptainContext'
+import {useNavigate} from "react-router-dom"
+import axios from "axios"
 
 const CaptainSignup = () => {
   const [firstname, setFirstname] = useState('')
@@ -8,26 +11,53 @@ const CaptainSignup = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [captainSignupData, setCaptainSignupData] = useState({})
+
+    const {captain, setCaptain} = useContext(CaptainDataContext)
+
+    const [vehicleColor, setVehicleColor] = useState('')
+    const [vehiclePlate, setVehiclePlate] = useState('')
+    const [vehicleCapacity, setVehicleCapacity] = useState('')
+    const [vehicleType, setVehicleType] = useState('')
+
+    const navigate = useNavigate()
   
-    const submitCaptainSignupData = (e) => {
+    const submitCaptainSignupData = async (e) => {
       e.preventDefault()
   
   
-      setCaptainSignupData({
+      const captainData = {
         fullname: {
           firstname: firstname,
           lastname: lastname
         },
         email: email,
-        password: password
-      })
+        password: password,
+        vehicle: {
+          color: vehicleColor,
+          plate: vehiclePlate,
+          capacity: vehicleCapacity,
+          vehicleType: vehicleType
+        }
+      }
+
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/register`, captainData)
+
+      if (response.status === 201){
+        const data = response.data
+        setCaptain(data.captain)
+        localStorage.setItem("captain-token", data.token)
+        navigate("/captain-home")
+      }
   
-      console.log(captainSignupData)
   
       setFirstname('')
       setLastname('')
       setEmail('')
       setPassword('')
+      setVehicleColor('')
+      setVehiclePlate('')
+      setVehicleCapacity('')
+      setVehicleType('')
     }
   return (
     <div className="p-7 h-screen flex flex-col justify-between">
@@ -39,7 +69,7 @@ const CaptainSignup = () => {
           <input
             required
             values={firstname}
-            className="rounded bg-[#eeeeee] font-medium px-2 py-2 border-none w-1/2 text-base placeholder:text-sm"
+            className="rounded bg-[#eeeeee] px-2 py-2 border-none w-1/2 text-base placeholder:text-sm"
             type="text"
             name="firstname"
             placeholder="First name"
@@ -49,7 +79,7 @@ const CaptainSignup = () => {
             required
             values={lastname}
             
-            className="rounded bg-[#eeeeee] font-medium px-2 py-2 border-none w-1/2 text-base placeholder:text-sm"
+            className="rounded bg-[#eeeeee] px-2 py-2 border-none w-1/2 text-base placeholder:text-sm"
             type="text"
             name="lastname"
             placeholder="Last name"
@@ -61,7 +91,7 @@ const CaptainSignup = () => {
             required
             values={email}
             
-            className="rounded bg-[#eeeeee] font-medium mb-6 px-2 py-2 border-none w-full text-base placeholder:text-sm"
+            className="rounded bg-[#eeeeee] mb-6 px-2 py-2 border-none w-full text-base placeholder:text-sm"
             type="email"
             name="email"
             placeholder="email@example.com"
@@ -70,7 +100,7 @@ const CaptainSignup = () => {
           />
           <h3 className="text-lg mb-2 font-medium">Password</h3>
           <input
-            className="rounded bg-[#eeeeee] font-medium mb-6 px-2 py-2 border-none w-full text-base placeholder:text-sm"
+            className="rounded bg-[#eeeeee] mb-6 px-2 py-2 border-none w-full text-base placeholder:text-sm"
             required
             values={password}
             name="password"
@@ -79,6 +109,54 @@ const CaptainSignup = () => {
             onChange={(e) => setPassword(e.target.value)}
 
           />
+          <h3 className='text-lg font-medium mb-2'>Vehicle Information</h3>
+          <div className='flex gap-4 mb-7'>
+            <input
+              required
+              className='bg-[#eeeeee] w-1/2 rounded-lg px-4 py-2 border-none text-lg placeholder:text-sm'
+              type="text"
+              placeholder='Vehicle Color'
+              value={vehicleColor}
+              onChange={(e) => {
+                setVehicleColor(e.target.value)
+              }}
+            />
+            <input
+              required
+              className='bg-[#eeeeee] w-1/2 rounded-lg px-4 py-2 border-none text-lg placeholder:text-sm'
+              type="text"
+              placeholder='Vehicle Plate'
+              value={vehiclePlate}
+              onChange={(e) => {
+                setVehiclePlate(e.target.value)
+              }}
+            />
+          </div>
+          <div className='flex gap-4 mb-7'>
+            <input
+              required
+              className='bg-[#eeeeee] w-1/2 rounded-lg px-4 py-2 border-none text-lg placeholder:text-sm'
+              type="number"
+              placeholder='Vehicle Capacity'
+              value={vehicleCapacity}
+              onChange={(e) => {
+                setVehicleCapacity(e.target.value)
+              }}
+            />
+            <select
+              required
+              className='bg-[#eeeeee] w-1/2 rounded-lg px-4 py-2 border-none text-sm'
+              value={vehicleType}
+              onChange={(e) => {
+                setVehicleType(e.target.value)
+              }}
+            >
+              <option className='text-[12px]' value="" disabled>Select Vehicle Type</option>
+              <option className='font-medium' value="Car">Car</option>
+              <option className='font-medium' value="Auto">Auto</option>
+              <option className='font-medium' value="Moto">Moto</option>
+            </select>
+          </div>
           <button 
           type="submit"
           className="rounded bg-[#111] text-[#fff] font-semibold mb-3 px-2 py-2 w-full text-lg">
